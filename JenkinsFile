@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage('git') {
             steps {
-                git credentialsId: '48369fb9-e386-4193-8661-07449e3c30fb', url: 'https://github.com/ChaabeneA/ExamThourayaS2.git'
+                git credentialsId: 'github', url: 'https://github.com/ChaabeneA/ExamThourayaS2.git'
             }
         }
         stage('MVN CLEAN') {
