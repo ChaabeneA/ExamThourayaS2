@@ -1,0 +1,61 @@
+pipeline {
+    agent any
+    stages {
+        stage('git') {
+            steps {
+                git credentialsId: '48369fb9-e386-4193-8661-07449e3c30fb', url: 'https://github.com/ChaabeneA/ExamThourayaS2.git'
+            }
+        }
+        stage('MVN CLEAN') {
+            steps {
+                sh 'mvn clean'
+            }
+        }
+        stage('MVN COMPILE') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('MVN TEST') {
+            steps {
+                sh 'mvn test'
+            }
+            post {
+                  always {
+                       junit(testResults: 'target/surefire-reports/*.xml', allowEmptyResults : true)
+                  }
+
+            }
+        }
+        stage('MVN SONARQUBE') {
+            steps {
+                sh 'mvn sonar:sonar \
+                    -Dsonar.projectKey=DevOps \
+                    -Dsonar.host.url=http://192.168.1.244:9000 \
+                    -Dsonar.login=28def7ffbe5b3663654061bce293e399bd515ff9'
+            }
+        }
+        stage('MVN DEPLOY') {
+            steps {
+                sh 'mvn deploy -DskipTests'
+            }
+        }
+         stage('Build and Push Docker Image') {
+                     steps {
+                         script {
+                           def dockerImage = docker.build("amirachaabene/examen-devops", "--file Dockerfile .")
+                           docker.withRegistry('https://registry.hub.docker.com', 'dockerhub_credentials') {
+                                                   dockerImage.push()
+                                                   }
+                         }
+                     }
+         }
+         stage('Deploy with Docker Compose') {
+           steps {
+                           sh 'docker-compose up -d'
+                      }
+         }
+
+
+    }
+}

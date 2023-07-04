@@ -1,0 +1,21 @@
+version: '3'
+services:
+  app:
+    image: amirachaabene/examen-devops:latest
+    ports:
+      - 8083:8083
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/DevOps?createDatabaseIfNotExist=TRUE&useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+    depends_on:
+      - db
+    links:
+      - db:DevOps
+  db:
+    container_name: db
+    image: mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: examv2thouraya
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
